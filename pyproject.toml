@@ -1,0 +1,20 @@
+[project]
+name = "zundoko-mcp-server"
+version = "0.1.0"
+description = "A sample MCP server that returns Zun or Doko randomly"
+authors = [
+    {name = "Kaito Yamada"}
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+dependencies = [
+    "fastmcp>=0.1.0"
+]
+
+[project.scripts]
+zundoko-server = "server:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
