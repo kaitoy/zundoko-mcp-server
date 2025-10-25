@@ -27,6 +27,21 @@ def get_history() -> list[str]:
     """
     return zundoko_history
 
+@mcp.resource("zundoko://history/{index}")
+def get_zundoko_from_history(index: int) -> str:
+    """
+    Returns a specific zundoko from history by index.
+
+    Args:
+        index: The index of the zundoko call (1-based)
+
+    Returns:
+        str: The zundoko value at the specified index
+    """
+    if index < 1 or index > len(zundoko_history):
+        raise ValueError(f"Invalid index: {index}")
+    return zundoko_history[index - 1]
+
 @mcp.tool
 def get_zundoko() -> str:
     """

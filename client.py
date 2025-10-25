@@ -15,12 +15,18 @@ async def main():
         resources = await client.list_resources()
         print(f"Available resources: {resources}")
 
+        resource_templates = await client.list_resource_templates()
+        print(f"Available resource templates: {resource_templates}")
+
         for i in range(5):
             result = await client.call_tool("get_zundoko", {})
             print(f"Result {i+1}: {result.content[0].text}")
 
         history = await client.read_resource("zundoko://history")
         print(f"\nZundoko History:\n{history}")
+
+        first_zundoko = await client.read_resource("zundoko://history/1")
+        print(f"\nFirst Zundoko:\n{first_zundoko}")
 
 
 if __name__ == "__main__":
