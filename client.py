@@ -12,8 +12,15 @@ async def main():
         tools = await client.list_tools()
         print(f"Available tools: {tools}")
 
-        result = await client.call_tool("get_zundoko", {})
-        print(f"Result: {result.content[0].text}")
+        resources = await client.list_resources()
+        print(f"Available resources: {resources}")
+
+        for i in range(5):
+            result = await client.call_tool("get_zundoko", {})
+            print(f"Result {i+1}: {result.content[0].text}")
+
+        history = await client.read_resource("zundoko://history")
+        print(f"\nZundoko History:\n{history}")
 
 
 if __name__ == "__main__":
