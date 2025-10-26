@@ -18,6 +18,12 @@ async def main():
         resource_templates = await client.list_resource_templates()
         print(f"Available resource templates: {resource_templates}")
 
+        prompts = await client.list_prompts()
+        print(f"Available prompts: {prompts}")
+
+        prompt_result = await client.get_prompt("explain_zundoko_kiyoshi")
+        print(f"\nPrompt result:\n{prompt_result}")
+
         for i in range(5):
             result = await client.call_tool("get_zundoko", {})
             print(f"Result {i+1}: {result.content[0].text}")

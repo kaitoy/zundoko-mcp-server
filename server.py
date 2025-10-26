@@ -42,6 +42,20 @@ def get_zundoko_from_history(index: int) -> str:
         raise ValueError(f"Invalid index: {index}")
     return zundoko_history[index - 1]
 
+@mcp.prompt
+def explain_zundoko_kiyoshi() -> str:
+    """
+    Explains how to do Zundoko Kiyoshi.
+
+    Returns:
+        str: Explanation of the Zundoko Kiyoshi
+    """
+    return """
+1. Randomly output either "Zun" or "Doko"
+2. Continue until you get the sequence "Zun Zun Zun Zun Doko" (four "Zun"s followed by one "Doko")
+3. When this sequence appears, output "Ki-yo-shi!" and end the program
+"""
+
 @mcp.tool
 async def get_zundoko(ctx: Context) -> str:
     """
