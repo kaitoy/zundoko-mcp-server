@@ -7,7 +7,7 @@ a tool to randomly return "Zun" or "Doko" text.
 """
 
 import random
-from fastmcp import FastMCP
+from fastmcp import FastMCP, Context
 
 mcp = FastMCP("Zundoko Server")
 
@@ -43,7 +43,7 @@ def get_zundoko_from_history(index: int) -> str:
     return zundoko_history[index - 1]
 
 @mcp.tool
-def get_zundoko() -> str:
+async def get_zundoko(ctx: Context) -> str:
     """
     Returns either "Zun" or "Doko" randomly.
 
@@ -53,6 +53,7 @@ def get_zundoko() -> str:
     choices = ["Zun", "Doko"]
     result = random.choice(choices)
     zundoko_history.append(result)
+    await ctx.session.send_resource_list_changed()
     return result
 
 if __name__ == "__main__":
