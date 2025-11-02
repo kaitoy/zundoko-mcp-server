@@ -5,10 +5,18 @@ Simple MCP client to connect to the Zundoko MCP server and call the zundoko tool
 
 import asyncio
 from fastmcp import Client
+from fastmcp.client.logging import LogMessage
+
+
+async def log_handler(message: LogMessage):
+    """Handle log messages from the server."""
+    msg = message.data.get('msg')
+    extra = message.data.get('extra')
+    print(f"[{message.level.upper()}] {msg} | Extra: {extra}")
 
 
 async def main():
-    async with Client("server.py") as client:
+    async with Client("server.py", log_handler=log_handler) as client:
         tools = await client.list_tools()
         print(f"Available tools: {tools}")
 

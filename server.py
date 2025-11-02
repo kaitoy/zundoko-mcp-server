@@ -68,6 +68,13 @@ async def get_zundoko(ctx: Context) -> str:
     result = random.choice(choices)
     zundoko_history.append(result)
     await ctx.session.send_resource_list_changed()
+    
+    history_count = len(zundoko_history)
+    await ctx.info(
+        f"Zundoko history now contains {history_count} item(s)",
+        extra={"count": history_count, "latest": result}
+    )
+    
     return result
 
 if __name__ == "__main__":
