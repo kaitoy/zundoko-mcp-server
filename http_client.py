@@ -54,6 +54,8 @@ async def main():
                 print(f"Error: {e}")
                 break
 
+        await client.call_tool("reset_zundoko_kiyoshi", {})
+
 
 if __name__ == "__main__":
     asyncio.run(main())

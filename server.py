@@ -7,7 +7,10 @@ a tool to randomly return "Zun" or "Doko" text.
 """
 
 import random
+from datetime import datetime
 from fastmcp import FastMCP, Context
+from fastmcp.exceptions import NotFoundError, ToolError
+from fastmcp.resources import TextResource
 from fastmcp.server.elicitation import (
     AcceptedElicitation,
     DeclinedElicitation,
@@ -17,6 +20,7 @@ from fastmcp.server.elicitation import (
 mcp = FastMCP("Zundoko Server")
 
 zundoko_history: list[str] = []
+kiyoshi: TextResource = None
 
 @mcp.resource(
     "zundoko://history",
@@ -47,6 +51,18 @@ def get_zundoko_from_history(index: int) -> str:
         raise ValueError(f"Invalid index: {index}")
     return zundoko_history[index - 1]
 
+@mcp.resource("zundoko://kiyoshi")
+def get_kiyoshi() -> str:
+    """
+    Returns the kiyoshi resource if it has been created.
+
+    Returns:
+        str: The kiyoshi message with timestamp
+    """
+    if kiyoshi is None:
+        raise NotFoundError("Kiyoshi has not been achieved yet")
+    return kiyoshi.text
+
 @mcp.prompt
 def explain_zundoko_kiyoshi() -> str:
     """
@@ -62,6 +78,23 @@ def explain_zundoko_kiyoshi() -> str:
 """
 
 @mcp.tool
+async def reset_zundoko_kiyoshi(ctx: Context) -> str:
+    """
+    Resets the zundoko history and removes kiyoshi.
+
+    Returns:
+        str: Confirmation message
+    """
+    zundoko_history.clear()
+    global kiyoshi
+    kiyoshi = None
+
+    await ctx.session.send_resource_list_changed()
+    await ctx.info("Reset Zundoko Kiyoshi.")
+
+    return "Reset complete"
+
+@mcp.tool
 async def get_zundoko(ctx: Context) -> str:
     """
     Returns either "Zun" or "Doko" randomly.
@@ -69,6 +102,9 @@ async def get_zundoko(ctx: Context) -> str:
     Returns:
         str: Either "Zun" or "Doko"
     """
+    if kiyoshi:
+        raise ToolError("The show is over.")
+
     choices = ["Zun", "Doko"]
     result = random.choice(choices)
     zundoko_history.append(result)
@@ -91,6 +127,8 @@ async def check_kiyoshi(ctx: Context) -> str:
     Returns:
         str: Status message indicating whether the pattern was found and elicitation result
     """
+    global kiyoshi
+
     history_count = len(zundoko_history)
 
     if history_count < 5:
@@ -105,15 +143,24 @@ async def check_kiyoshi(ctx: Context) -> str:
         match elicit_result:
             case AcceptedElicitation(data=response):
                 if "Ki-yo-shi!" == response:
+                    kiyoshi = TextResource(
+                        uri="zundoko://kiyoshi",
+                        name="Ki-yo-shi!",
+                        text=f"Ki-yo-shi! at {datetime.now().isoformat()}",
+                    )
+                    await ctx.session.send_resource_list_changed()
                     await ctx.info("Zundoko Kiyoshi completed.")
                     return "Perfect!'"
                 else:
+                    zundoko_history.clear()
                     await ctx.warning(f"User said '{response}', but the correct answer is 'Ki-yo-shi!'")
                     return f"Pattern found! But you said '{response}' instead of 'Ki-yo-shi!'"
             case DeclinedElicitation():
+                zundoko_history.clear()
                 await ctx.warning("User declined to say Ki-yo-shi!")
                 return "Pattern found! You declined to say 'Ki-yo-shi!'"
             case CancelledElicitation():
+                zundoko_history.clear()
                 await ctx.info("Ki-yo-shi! cancelled.")
                 return "Pattern found! You cancelled Ki-yo-shi!"
     else:
