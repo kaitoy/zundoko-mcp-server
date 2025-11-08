@@ -8,6 +8,8 @@ import asyncio
 from fastmcp import Client
 from fastmcp.client.elicitation import ElicitResult
 from fastmcp.client.logging import LogMessage
+from fastmcp.client.sampling import SamplingMessage, SamplingParams, RequestContext
+from openai import AsyncOpenAI
 
 
 async def handle_message(message):
@@ -21,6 +23,24 @@ async def log_handler(message: LogMessage):
 
 
 kiyoshi_answered = False
+
+
+async def sampling_handler(
+    messages: list[SamplingMessage],
+    params: SamplingParams,
+    context: RequestContext
+) -> str:
+    """Handle sampling requests from the server using OpenAI."""
+    message_content = messages[0].content.text
+
+    response = await AsyncOpenAI().responses.create(
+        model="gpt-5-nano",
+        input=message_content,
+        max_output_tokens=params.maxTokens or 5120,
+        temperature=params.temperature or 1.0,
+    )
+
+    return response.output_text
 
 
 async def elicitation_handler(message: str, response_type: type, params, context):
@@ -37,7 +57,8 @@ async def main():
         "http://127.0.0.1:8080/mcp",
         message_handler=handle_message,
         log_handler=log_handler,
-        elicitation_handler=elicitation_handler
+        elicitation_handler=elicitation_handler,
+        sampling_handler=sampling_handler
     ) as client:
         print("Starting Zundoko Kiyoshi...\n")
 

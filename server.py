@@ -153,8 +153,17 @@ async def check_kiyoshi(ctx: Context) -> str:
                     return "Perfect!'"
                 else:
                     zundoko_history.clear()
+                    prompt = (
+                        f"The user was supposed to say 'Ki-yo-shi!' but instead said '{response}'. "
+                        "Generate a humorous and creative warning message (one sentence) about their mistake."
+                    )
+                    sampling_result = await ctx.sample(
+                        messages=prompt,
+                        max_tokens=5120,
+                        temperature=1.0
+                    )
                     await ctx.warning(f"User said '{response}', but the correct answer is 'Ki-yo-shi!'")
-                    return f"Pattern found! But you said '{response}' instead of 'Ki-yo-shi!'"
+                    return sampling_result.text
             case DeclinedElicitation():
                 zundoko_history.clear()
                 await ctx.warning("User declined to say Ki-yo-shi!")
