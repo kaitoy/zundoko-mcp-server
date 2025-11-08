@@ -17,7 +17,10 @@ from fastmcp.server.elicitation import (
     CancelledElicitation,
 )
 
-mcp = FastMCP("Zundoko Server")
+mcp = FastMCP(
+    "Zundoko Server",
+    sampling_handler=lambda *_: "Correct answer is 'Ki-yo-shi!'"
+)
 
 zundoko_history: list[str] = []
 kiyoshi: TextResource = None
