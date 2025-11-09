@@ -97,6 +97,24 @@ async def reset_zundoko_kiyoshi(ctx: Context) -> str:
 
     return "Reset complete"
 
+def _calc_zundoko_progress():
+    consecutive_zuns = 0
+    for item in reversed(zundoko_history):
+        if item == "Zun":
+            consecutive_zuns += 1
+        else:
+            break
+
+    target_pattern = ["Zun", "Zun", "Zun", "Zun", "Doko"]
+    if len(zundoko_history) >= 5 and zundoko_history[-5:] == target_pattern:
+        return 5, "Ki-yo-shi complete!"
+    elif consecutive_zuns >= 4:
+        return 4, "Four Zuns in a row, waiting for Doko"
+    elif consecutive_zuns > 0:
+        return consecutive_zuns, f"{consecutive_zuns} consecutive Zun(s)"
+    else:
+        return 0, "Waiting for a Zun"
+
 @mcp.tool
 async def get_zundoko(ctx: Context) -> str:
     """
@@ -112,6 +130,11 @@ async def get_zundoko(ctx: Context) -> str:
     result = random.choice(choices)
     zundoko_history.append(result)
     await ctx.session.send_resource_list_changed()
+
+    zundoko_progress = _calc_zundoko_progress()
+    await ctx.report_progress(
+        progress=zundoko_progress[0], total=5, message=zundoko_progress[1]
+    )
 
     history_count = len(zundoko_history)
     await ctx.info(

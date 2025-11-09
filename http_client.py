@@ -52,13 +52,20 @@ async def elicitation_handler(message: str, response_type: type, params, context
     return ElicitResult(action="accept", content=response_type(value=user_input))
 
 
+async def progress_handler(progress: int, total: int, message: str = None):
+    """Handle progress updates from the server."""
+    percentage = progress / total * 100
+    print(f"Progress: {progress}/{total} ({percentage:.0f}%) - {message}")
+
+
 async def main():
     async with Client(
         "http://127.0.0.1:8080/mcp",
         message_handler=handle_message,
         log_handler=log_handler,
         elicitation_handler=elicitation_handler,
-        sampling_handler=sampling_handler
+        sampling_handler=sampling_handler,
+        progress_handler=progress_handler
     ) as client:
         print("Starting Zundoko Kiyoshi...\n")
 
