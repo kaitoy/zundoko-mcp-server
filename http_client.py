@@ -67,6 +67,10 @@ async def main():
         sampling_handler=sampling_handler,
         progress_handler=progress_handler
     ) as client:
+        print("Pinging server...")
+        await client.ping()
+        print("Server is alive!\n")
+
         print("Starting Zundoko Kiyoshi...\n")
 
         while True:
