@@ -92,7 +92,7 @@ async def reset_zundoko_kiyoshi(ctx: Context) -> str:
     global kiyoshi
     kiyoshi = None
 
-    await ctx.session.send_resource_list_changed()
+    await ctx.send_resource_list_changed()
     await ctx.info("Reset Zundoko Kiyoshi.")
 
     return "Reset complete"
@@ -129,7 +129,7 @@ async def get_zundoko(ctx: Context) -> str:
     choices = ["Zun", "Doko"]
     result = random.choice(choices)
     zundoko_history.append(result)
-    await ctx.session.send_resource_list_changed()
+    await ctx.send_resource_list_changed()
 
     zundoko_progress = _calc_zundoko_progress()
     await ctx.report_progress(
@@ -174,7 +174,7 @@ async def check_kiyoshi(ctx: Context) -> str:
                         name="Ki-yo-shi!",
                         text=f"Ki-yo-shi! at {datetime.now().isoformat()}",
                     )
-                    await ctx.session.send_resource_list_changed()
+                    await ctx.send_resource_list_changed()
                     await ctx.info("Zundoko Kiyoshi completed.")
                     return "Perfect!'"
                 else:
